@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Skapa Ärende - Ticket Service</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+<h2>Skapa ett nytt supportärende</h2>
+
+<form th:action="@{/tickets}" th:object="${ticket}" method="post" style="max-width: 500px;">
+    <div style="margin-bottom: 15px;">
+        <label><strong>Titel / Rubrik:</strong><br/>
+            <input type="text" th:field="*{title}" required style="padding: 6px; width: 100%; box-sizing: border-box;"/>
+        </label>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label><strong>Beskriv din händelse eller problem:</strong><br/>
+            <textarea th:field="*{description}" rows="6" required style="padding: 6px; width: 100%; box-sizing: border-box;"></textarea>
+        </label>
+    </div>
+
+    <button type="submit" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px;">Skicka in ärende</button>
+    <a th:href="@{/tickets}" style="margin-left: 15px; color: #6c757d; text-decoration: none;">Avbryt</a>
+</form>
+</body>
+</html>

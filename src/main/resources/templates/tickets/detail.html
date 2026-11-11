@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Ärendedetaljer - Ticket Service</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+<h2>Ärende Detaljer</h2>
+
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #dee2e6;">
+    <p><strong>Ärende ID:</strong> <span th:text="${ticket.id}"></span></p>
+    <p><strong>Titel:</strong> <span th:text="${ticket.title}"></span></p>
+    <p><strong>Beskrivning:</strong></p>
+    <p style="background: white; padding: 10px; border: 1px solid #eee;" th:text="${ticket.description}"></p>
+    <p><strong>Nuvarande Status:</strong> <span th:text="${ticket.status}" style="font-weight: bold; color: #0056b3;"></span></p>
+    <!-- ÄNDRAT: Direkt datumutskrift utan #temporals.format för att förhindra krasch -->
+    <p><strong>Inskickat av:</strong> <span th:text="${ticket.creator.username}"></span> den <span th:text="${ticket.createdAt}"></span></p>
+    <p><strong>Ansvarig Handläggare:</strong> <span th:text="${ticket.agent != null ? ticket.agent.username : 'Ingen tilldelad ännu'}"></span></p>
+</div>
+
+<!-- AGENT-Funktion: Tilldela ärendet till sig själv om det saknar handläggare -->
+<div sec:authorize="hasRole('ROLE_AGENT')" th:if="${ticket.agent == null}" style="margin-bottom: 20px;">
+    <form th:action="@{/tickets/{id}/claim(id=${ticket.id})}" method="post">
+        <button type="submit" style="background-color: #17a2b8; color: white; padding: 8px 15px; border: none; cursor: pointer; border-radius: 4px;">Ta på mig detta ärende (Claim)</button>
+    </form>
+</div>
+
+<!-- AGENT-Funktion: Ändra status på ärendet -->
+<div sec:authorize="hasRole('ROLE_AGENT')" style="margin-bottom: 30px; background-color: #fff3cd; padding: 15px; border-radius: 5px; border: 1px solid #ffeeba;">
+    <form th:action="@{/tickets/{id}/status(id=${ticket.id})}" method="post">
+        <label><strong>Uppdatera ärendestatus:</strong>
+            <select name="status" style="padding: 5px; margin-left: 10px;">
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == ticket.status}"></option>
+            </select>
+        </label>
+        <button type="submit" style="padding: 5px 10px; margin-left: 5px; cursor: pointer;">Spara ny status</button>
+    </form>
+</div>
+
+<hr/>
+
+<h3>Kommunikation & Kommentarer</h3>
+
+<!-- Lista med alla kommentarer -->
+<div style="margin-bottom: 20px;">
+    <div th:if="${ticket.comments.isEmpty()}" style="color: gray; font-style: italic;">Inga kommentarer ännu på detta ärende.</div>
+
+    <div th:each="c : ${ticket.comments}" style="border-bottom: 1px solid #eee; padding: 10px 0;">
+        <strong th:text="${c.user.username}"></strong>
+        <!-- ÄNDRAT: Direkt datumutskrift även här -->
+        <span style="color: gray; font-size: 0.85em;" th:text="${c.createdAt}"></span>:
+        <p style="margin: 5px 0 0 0;" th:text="${c.content}"></p>
+    </div>
+</div>
+
+<!-- Formulär för att lägga till en kommentar (Både USER och AGENT kan skriva) -->
+<form th:action="@{/tickets/{id}/comments(id=${ticket.id})}" method="post" style="max-width: 500px;">
+    <label><strong>Skriv en ny kommentar/svar:</strong><br/>
+        <textarea name="content" rows="4" required style="padding: 6px; width: 100%; box-sizing: border-box; margin-top: 5px;"></textarea>
+    </label><br/>
+    <button type="submit" style="padding: 7px 15px; margin-top: 5px; cursor: pointer;">Skicka kommentar</button>
+</form>
+
+<br/>
+<a th:href="@{/tickets}">Tillbaka till ärendelistan</a>
+</body>
+</html>
