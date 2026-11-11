@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Ärenden - Ticket Service</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+<header style="background-color: #f4f4f4; padding: 15px; margin-bottom: 20px;">
+    Inloggad som: <strong sec:authentication="name"></strong>
+    (<span sec:authentication="principal.authorities"></span>)
+
+    <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 20px;">
+        <button type="submit" style="cursor: pointer;">Logga ut</button>
+    </form>
+</header>
+
+<h2>Ärenden</h2>
+
+<!-- Knappen visas för alla, men är primärt till för USER att skapa ärenden -->
+<a th:href="@{/tickets/new}" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Skapa nytt ärende</a>
+<br/><br/>
+
+<table border="1" style="border-collapse: collapse; width: 100%; text-align: left;">
+    <thead style="background-color: #e9ecef;">
+    <tr>
+        <th style="padding: 8px;">ID</th>
+        <th style="padding: 8px;">Titel</th>
+        <th style="padding: 8px;">Status</th>
+        <th style="padding: 8px;">Skapad Av</th>
+        <th style="padding: 8px;">Handläggare (Agent)</th>
+        <th style="padding: 8px;">Åtgärd</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Om listan är tom -->
+    <tr th:if="${tickets.isEmpty()}">
+        <td colspan="6" style="padding: 10px; text-align: center; color: gray;">Inga ärenden hittades.</td>
+    </tr>
+    <!-- Loopar igenom alla ärenden (USER ser bara egna, AGENT ser alla) -->
+    <tr th:each="t : ${tickets}">
+        <td style="padding: 8px;" th:text="${t.id}"></td>
+        <td style="padding: 8px;" th:text="${t.title}"></td>
+        <td style="padding: 8px;">
+            <span th:text="${t.status}" style="font-weight: bold; padding: 3px 8px; border-radius: 3px; background-color: #fff3cd;"></span>
+        </td>
+        <td style="padding: 8px;" th:text="${t.creator.username}"></td>
+        <td style="padding: 8px;" th:text="${t.agent != null ? t.agent.username : 'Ej tilldelad'}"></td>
+        <td style="padding: 8px;">
+            <a th:href="@{/tickets/{id}(id=${t.id})}">Visa detaljer & Kommentera</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

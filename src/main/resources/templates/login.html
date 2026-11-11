@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logga in - Ärendehantering</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 380px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #1c1e21;
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4b4f56;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s;
+        }
+        .btn-login:hover {
+            background-color: #0056b3;
+        }
+        .alert-error {
+            background-color: #ffebe8;
+            border: 1px solid #dd3c10;
+            color: #dd3c10;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .alert-logout {
+            background-color: #e6f4ea;
+            border: 1px solid #34a853;
+            color: #1e8e3e;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Helpdesk - Logga in</h2>
+
+
+    <!-- Visar felmeddelande om inloggningen misslyckas -->
+    <div th:if="${param.error}" class="alert-error">
+        Felaktigt användarnamn eller lösenord.
+    </div>
+
+    <!-- Visar meddelande vid utloggning -->
+    <div th:if="${param.logout}" class="alert-logout">
+        Du har loggats ut.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="username">Användarnamn</label>
+            <input type="text" id="username" name="username" placeholder="Ange ditt användarnamn" required autofocus/>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Lösenord</label>
+            <input type="password" id="password" name="password" placeholder="Ange ditt lösenord" required/>
+        </div>
+
+        <button type="submit" class="btn-login">Logga in</button>
+    </form>
+</div>
+
+</body>
+</html>
+
