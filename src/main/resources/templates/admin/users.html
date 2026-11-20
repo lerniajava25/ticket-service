@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Adminpanel - Hantera Användare</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+
+<header style="background-color: #f4f4f4; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        Inloggad som: <strong sec:authentication="name"></strong> (ADMIN)
+        <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 20px;">
+            <button type="submit" style="cursor: pointer;">Logga ut</button>
+        </form>
+    </div>
+    <div>
+        <a th:href="@{/tickets}" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">
+            ← Tillbaka till Ärenden
+        </a>
+    </div>
+</header>
+
+<h2>Administrera Användare</h2>
+
+<!-- Meddelanden -->
+<div th:if="${param.error != null and param.error[0] == 'UsernameExists'}" style="color: red; background: #ffebe8; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+    Användarnamnet är redan upptaget!
+</div>
+<div th:if="${param.error != null and param.error[0] == 'CannotDisableSelf'}" style="color: red; background: #ffebe8; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+    Du kan inte inaktivera ditt eget administratörskonto!
+</div>
+<div th:if="${param.success}" style="color: green; background: #e6f4ea; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+    Ändringen har sparats!
+</div>
+
+<!-- Formulär för att skapa ny användare -->
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; border: 1px solid #dee2e6; margin-bottom: 30px; max-width: 600px;">
+    <h3 style="margin-top: 0;">Skapa ny användare</h3>
+    <form th:action="@{/admin/users}" method="post" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+        <div>
+            <label><strong>Användarnamn:</strong><br/>
+                <input type="text" name="username" required style="padding: 6px;"/>
+            </label>
+        </div>
+        <div>
+            <label><strong>Lösenord:</strong><br/>
+                <input type="password" name="password" required style="padding: 6px;"/>
+            </label>
+        </div>
+        <div>
+            <label><strong>Roll:</strong><br/>
+                <select name="role" style="padding: 6px;">
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                </select>
+            </label>
+        </div>
+        <div>
+            <button type="submit" style="background-color: #28a745; color: white; padding: 7px 15px; border: none; border-radius: 4px; cursor: pointer;">
+                + Skapa konto
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Tabell med alla användare -->
+<table border="1" style="border-collapse: collapse; width: 100%; text-align: left;">
+    <thead style="background-color: #e9ecef;">
+    <tr>
+        <th style="padding: 8px;">ID</th>
+        <th style="padding: 8px;">Användarnamn</th>
+        <th style="padding: 8px;">Nuvarande Roll</th>
+        <th style="padding: 8px;">Ändra Roll</th>
+        <th style="padding: 8px;">Kontostatus</th>
+        <th style="padding: 8px;">Aktivera / Inaktivera</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${users}">
+        <td style="padding: 8px;" th:text="${u.id}"></td>
+        <td style="padding: 8px;"><strong th:text="${u.username}"></strong></td>
+        <td style="padding: 8px;" th:text="${u.role}"></td>
+        <td style="padding: 8px;">
+            <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" style="display: inline;">
+                <select name="role" style="padding: 4px;">
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r}" th:selected="${r == u.role}"></option>
+                </select>
+                <button type="submit" style="padding: 4px 8px; cursor: pointer;">Spara roll</button>
+            </form>
+        </td>
+        <td style="padding: 8px;">
+            <span th:if="${u.enabled}" style="color: green; font-weight: bold;">Aktivt</span>
+            <span th:unless="${u.enabled}" style="color: red; font-weight: bold;">Inaktiverat</span>
+        </td>
+        <td style="padding: 8px;">
+            <form th:action="@{/admin/users/{id}/toggle-status(id=${u.id})}" method="post" style="display: inline;">
+                <button type="submit" th:text="${u.enabled ? 'Inaktivera konto' : 'Aktivera konto'}"
+                        th:style="${u.enabled ? 'background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;' : 'background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;'}">
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
