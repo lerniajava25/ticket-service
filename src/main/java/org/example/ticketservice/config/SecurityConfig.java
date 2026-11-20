@@ -20,9 +20,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Tillfälligt avstängt för att garantera att inga dolda token-fel kraschar inloggningen
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/error", "/css/**").permitAll()
+                        // Endast ADMIN får komma åt /admin/**
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -38,3 +40,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+

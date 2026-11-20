@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>Ärenden - Ticket Service</title>
+    <title>Ärenden - Helpdesk</title>
 </head>
 <body style="font-family: Arial, sans-serif; margin: 40px;">
-<header style="background-color: #f4f4f4; padding: 15px; margin-bottom: 20px;">
-    Inloggad som: <strong sec:authentication="name"></strong>
-    (<span sec:authentication="principal.authorities"></span>)
 
-    <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 20px;">
-        <button type="submit" style="cursor: pointer;">Logga ut</button>
-    </form>
+<header style="background-color: #f4f4f4; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        Inloggad som: <strong sec:authentication="name"></strong>
+        (<span sec:authentication="principal.authorities"></span>)
+
+        <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 20px;">
+            <button type="submit" style="cursor: pointer;">Logga ut</button>
+        </form>
+    </div>
+
+    <!-- Visas BARA om användaren har rollen ADMIN -->
+    <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <a th:href="@{/admin/users}" style="background-color: #343a40; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+            ⚙️ Administrera Användare
+        </a>
+    </div>
 </header>
 
 <h2>Ärenden</h2>
 
-<!-- Knappen visas för alla, men är primärt till för USER att skapa ärenden -->
-<a th:href="@{/tickets/new}" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Skapa nytt ärende</a>
-<br/><br/>
+<!-- Visas BARA för rollen USER (Dold för AGENT och ADMIN) -->
+<div sec:authorize="hasRole('ROLE_USER')" style="margin-bottom: 15px;">
+    <a th:href="@{/tickets/new}" style="background-color: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">Skapa nytt ärende</a>
+</div>
 
 <table border="1" style="border-collapse: collapse; width: 100%; text-align: left;">
     <thead style="background-color: #e9ecef;">
@@ -36,7 +48,7 @@
     <tr th:if="${tickets.isEmpty()}">
         <td colspan="6" style="padding: 10px; text-align: center; color: gray;">Inga ärenden hittades.</td>
     </tr>
-    <!-- Loopar igenom alla ärenden (USER ser bara egna, AGENT ser alla) -->
+    <!-- Loopar igenom alla ärenden (USER ser bara egna, AGENT och ADMIN ser alla) -->
     <tr th:each="t : ${tickets}">
         <td style="padding: 8px;" th:text="${t.id}"></td>
         <td style="padding: 8px;" th:text="${t.title}"></td>
@@ -51,5 +63,7 @@
     </tr>
     </tbody>
 </table>
+
 </body>
 </html>
+
